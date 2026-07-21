@@ -1,0 +1,14 @@
+Description: Generic JSON API v1 for SIP automation and sipctl.
+Copyright 2026
+Author: Tiko / Homer
+Email: su-tiko@proton.me
+License: GNU GPL 3.0
+
+Requirements: SIP 5.x. Install this plugin and restart SIP.
+
+##### List all plugin files below preceded by a blank line [file_name.ext path] relative to SIP directory #####
+
+api.py plugins
+openapi.json plugins
+openapi.yaml plugins
+api.manifest plugins/manifests

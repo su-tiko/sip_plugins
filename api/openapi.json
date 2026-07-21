@@ -1,0 +1,459 @@
+{
+  "components": {
+    "schemas": {
+      "ConfigValue": {
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "value": {}
+        },
+        "type": "object"
+      },
+      "Envelope": {
+        "properties": {
+          "data": {},
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Error"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "meta": {
+            "type": "object"
+          },
+          "ok": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok",
+          "data",
+          "error",
+          "meta"
+        ],
+        "type": "object"
+      },
+      "Error": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "LogEntry": {
+        "type": "object"
+      },
+      "Program": {
+        "properties": {
+          "enabled": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ProgramAction": {
+        "properties": {
+          "action": {
+            "enum": [
+              "create",
+              "update",
+              "run",
+              "enable",
+              "disable",
+              "delete",
+              "import"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "program": {
+            "$ref": "#/components/schemas/Program"
+          }
+        },
+        "type": "object"
+      },
+      "RunOnceRequest": {
+        "properties": {
+          "preempt": {
+            "type": "boolean"
+          },
+          "stations": {
+            "items": {
+              "properties": {
+                "duration": {
+                  "type": "integer"
+                },
+                "station": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "Station": {
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "remaining": {
+            "type": "integer"
+          },
+          "state": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "StationAction": {
+        "properties": {
+          "action": {
+            "enum": [
+              "on",
+              "off",
+              "stop_all",
+              "rename",
+              "enable",
+              "disable",
+              "set_option"
+            ],
+            "type": "string"
+          },
+          "duration": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "TokenAction": {
+        "properties": {
+          "action": {
+            "enum": [
+              "create",
+              "revoke"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "TokenMetadata": {
+        "properties": {
+          "created_at": {
+            "type": "integer"
+          },
+          "expires_at": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "revoked": {
+            "type": "boolean"
+          },
+          "scopes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "scheme": "bearer",
+        "type": "http"
+      },
+      "cookieAuth": {
+        "in": "cookie",
+        "name": "webpy_session_id",
+        "type": "apiKey"
+      }
+    }
+  },
+  "info": {
+    "description": "Generic JSON API v1 for SIP and sipctl.",
+    "title": "SIP Generic API",
+    "version": "1.0.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/v1/auth/tokens": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Tokens"
+          }
+        },
+        "summary": "List token metadata"
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token result"
+          }
+        },
+        "summary": "Create or revoke tokens"
+      }
+    },
+    "/api/v1/config": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Config"
+          }
+        },
+        "summary": "Read SIP config"
+      },
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Updated"
+          }
+        },
+        "summary": "Set SIP config value"
+      }
+    },
+    "/api/v1/logs": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Logs"
+          }
+        },
+        "summary": "List/export logs"
+      },
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Cleared"
+          }
+        },
+        "summary": "Clear logs"
+      }
+    },
+    "/api/v1/openapi.json": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OpenAPI JSON"
+          }
+        },
+        "security": [],
+        "summary": "OpenAPI document"
+      }
+    },
+    "/api/v1/program": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Program"
+          }
+        },
+        "summary": "Show one program"
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgramAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Accepted"
+          }
+        },
+        "summary": "Create, update, run, enable, disable or delete a program"
+      }
+    },
+    "/api/v1/programs": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Programs"
+          }
+        },
+        "summary": "List programs"
+      }
+    },
+    "/api/v1/runonce": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunOnceRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Accepted"
+          }
+        },
+        "summary": "Start or stop run-once irrigation"
+      }
+    },
+    "/api/v1/server": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Version"
+          }
+        },
+        "summary": "Server version and health"
+      },
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Accepted"
+          }
+        },
+        "summary": "Server operations"
+      }
+    },
+    "/api/v1/station": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Station"
+          }
+        },
+        "summary": "Show one station"
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StationAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Accepted"
+          }
+        },
+        "summary": "Mutate station"
+      }
+    },
+    "/api/v1/stations": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            },
+            "description": "Stations"
+          }
+        },
+        "summary": "List stations"
+      }
+    },
+    "/api/v1/status": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            },
+            "description": "Status"
+          }
+        },
+        "summary": "Get normalized SIP status"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    },
+    {
+      "cookieAuth": []
+    }
+  ],
+  "servers": [
+    {
+      "url": "/"
+    }
+  ]
+}
